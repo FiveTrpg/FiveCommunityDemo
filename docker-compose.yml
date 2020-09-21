@@ -1,0 +1,7 @@
+version: '3.4'
+
+services:
+  gaming.api:
+    build:
+      context: .
+      dockerfile: src/Services/Gaming/Gaming.API/Dockerfile
