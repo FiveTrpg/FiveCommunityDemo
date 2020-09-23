@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using Gaming.API.Application;
+using Gaming.API.Controllers.Models;
 using Gaming.API.Domain.Lobby;
-using Gaming.API.Models;
 using Gaming.API.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;

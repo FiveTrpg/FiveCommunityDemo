@@ -1,13 +1,19 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Gaming.API.Applications;
-using Gaming.API.Controllers;
+using Gaming.API.Infrastructure.Data.FiveUsers;
+using Gaming.API.Infrastructure.Data.FiveUsers.Models;
 using Gaming.API.Infrastructure.Repository;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Reflection;
 
 namespace Gaming.API
 {
@@ -21,16 +27,39 @@ namespace Gaming.API
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(UserController.CookieScheme).AddCookie(UserController.CookieScheme, options =>
-            {
-                options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-                options.LoginPath = "/sign-in";
-            });
+            services.AddDbContext<FiveUserContext>(options =>
+                options.UseMySql(Configuration.GetConnectionString("UserDbConnection"), db =>
+                {
+                    var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+                    db.MigrationsAssembly(migrationsAssembly);
+                    db.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                }));
+
+
+            services.AddDefaultIdentity<FiveUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<FiveUserContext>();
+
+            services.AddIdentityServer()
+                .AddApiAuthorization<FiveUser, FiveUserContext>();
+
+            services.AddAuthentication()
+                .AddIdentityServerJwt();
+
             services.AddControllers();
             services.AddLobbyApplication(option => option.UsePlayerRepository<MemoryPlayerRepository>());
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/build";
+            });
+
+            var container = new ContainerBuilder();
+            container.Populate(services);
+
+            return new AutofacServiceProvider(container.Build());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,16 +68,26 @@ namespace Gaming.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
             }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
+
             app.UseRouting();
 
-            app.UseCookiePolicy();
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseIdentityServer();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
 
             app.UseSpa(spa =>

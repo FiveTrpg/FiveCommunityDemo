@@ -1,4 +1,4 @@
-﻿namespace Gaming.API.Models
+﻿namespace Gaming.API.Controllers.Models
 {
     public class LoginParam
     {
