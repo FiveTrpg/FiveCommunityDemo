@@ -60,7 +60,7 @@ export class LoginMenu extends Component<{}, LoginMenuState> {
         <NavLink tag={Link} className="text-dark" to="/counter">跑团</NavLink>
       </NavItem>
       <NavItem>
-        <NavLink tag={Link} className="text-dark" to="/fetch-data">版聊</NavLink>
+        <NavLink tag={Link} className="text-dark" to="/chat">版聊</NavLink>
       </NavItem>
       <NavItem>
         <NavLink tag={Link} className="text-dark" to={profilePath}>{userName}</NavLink>

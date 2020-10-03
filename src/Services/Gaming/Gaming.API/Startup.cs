@@ -1,8 +1,8 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Gaming.API.Applications;
-using Gaming.API.Infrastructure.Data.FiveUsers;
-using Gaming.API.Infrastructure.Data.FiveUsers.Models;
+using Gaming.API.Infrastructure.Data.Community;
+using Gaming.API.Infrastructure.Data.Community.Models;
 using Gaming.API.Infrastructure.Repository;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -29,7 +29,7 @@ namespace Gaming.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<FiveUserContext>(options =>
+            services.AddDbContext<FiveCommunityContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("UserDbConnection"), db =>
                 {
                     var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
@@ -39,10 +39,10 @@ namespace Gaming.API
 
 
             services.AddDefaultIdentity<FiveUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<FiveUserContext>();
+                .AddEntityFrameworkStores<FiveCommunityContext>();
 
             services.AddIdentityServer()
-                .AddApiAuthorization<FiveUser, FiveUserContext>();
+                .AddApiAuthorization<FiveUser, FiveCommunityContext>();
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
@@ -56,10 +56,11 @@ namespace Gaming.API
                 configuration.RootPath = "ClientApp/build";
             });
 
-            var container = new ContainerBuilder();
-            container.Populate(services);
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Populate(services);
+            var container = containerBuilder.Build();
 
-            return new AutofacServiceProvider(container.Build());
+            return new AutofacServiceProvider(container);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

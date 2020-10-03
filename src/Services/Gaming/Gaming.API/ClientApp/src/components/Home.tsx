@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Button, Jumbotron } from 'reactstrap';
+import { Button, Col, Container, Jumbotron, Row } from 'reactstrap';
 import { ApplicationPaths, QueryParameterNames } from './api-authorization/ApiAuthorizationConstants';
 import authService from './api-authorization/AuthorizeService';
 
@@ -35,20 +35,15 @@ class Home extends React.Component<{}, HomeState> {
 
   render() {
     const { user } = this.state;
+    if (!user) {
+      return (<h1>服务器错误</h1>);
+    }
     return (
-      <Jumbotron>
-        <h1 className="display-3">欢迎, </h1>
-        <p className="lead">{user ? user.name : ''}</p>
-        <hr className="my-2" />
-        { !user && (
-          <div>
-            <p>三次元废物聚集地，限时开放注册</p>
-            <p className="lead">
-              <Button color="primary" onClick={this.onRegisterClick}>立即注册</Button>
-            </p>
-          </div>
-        )}
-      </Jumbotron>
+      <Container>
+        <Row>
+          <Col>今天是废物社区 元年一月一日</Col>
+        </Row>
+      </Container>
     );
   }
 }

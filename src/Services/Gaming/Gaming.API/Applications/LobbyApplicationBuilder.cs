@@ -1,21 +1,30 @@
 ﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Gaming.API.Domain.Lobby;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Gaming.API.Application
 {
     public class LobbyApplicationBuilder
     {
-        private readonly ContainerBuilder _builder = new ContainerBuilder();
-        public LobbyApplicationBuilder UsePlayerRepository<TRepository>() where TRepository : IPlayerRepository
+        private IServiceCollection Services { get; }
+        public LobbyApplicationBuilder(IServiceCollection services)
         {
-            _builder.RegisterType<TRepository>().As<IPlayerRepository>().SingleInstance();
+            Services = services;
+        }
+        public LobbyApplicationBuilder UsePlayerRepository<TRepository>() where TRepository : class, IPlayerRepository
+        {
+            Services.AddSingleton<IPlayerRepository, TRepository>();
             return this;
         }
         public LobbyApplication Build()
         {
-            _builder.RegisterType<Lobby>().AsSelf().SingleInstance();
-            _builder.RegisterType<PlayerFactory>().AsSelf().SingleInstance();
-            return new LobbyApplication(_builder);
+            Services.AddSingleton<Lobby>();
+            Services.AddSingleton<PlayerFactory>();
+            var container = new ContainerBuilder();
+            container.Populate(Services);
+
+            return new LobbyApplication(container);
         }
     }
 }

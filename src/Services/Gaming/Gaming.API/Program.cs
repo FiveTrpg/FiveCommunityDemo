@@ -1,4 +1,4 @@
-using Gaming.API.Infrastructure.Data.FiveUsers;
+using Gaming.API.Infrastructure.Data.Community;
 using Gaming.API.Utils;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -23,7 +23,7 @@ namespace Gaming.API
         {
             CreateHostBuilder(args)
                 .Build()
-                .MigrateDbContext<FiveUserContext>((_, __) => { })
+                .MigrateDbContext<FiveCommunityContext>((_, __) => { })
                 .Run();
         }
 

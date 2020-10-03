@@ -44,7 +44,7 @@ namespace Gaming.API.Controllers
                 };
                 var claimsIdentity = new ClaimsIdentity(claims, CookieScheme);
                 var user = new ClaimsPrincipal(claimsIdentity);
-                await HttpContext.SignInAsync(CookieScheme, user, AuthProperties);
+                //await HttpContext.SignInAsync(CookieScheme, user, AuthProperties);
                 return Ok();
             }
             return Ok(new { Message = "Already logged" });

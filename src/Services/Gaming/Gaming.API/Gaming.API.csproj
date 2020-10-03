@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="EmberKernel" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="3.1.8" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.8" />
@@ -30,8 +31,12 @@
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Compile Remove="Services\**" />
     <Content Remove="$(SpaRoot)**" />
+    <Content Remove="Services\**" />
+    <EmbeddedResource Remove="Services\**" />
     <None Remove="$(SpaRoot)**" />
+    <None Remove="Services\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
@@ -43,9 +48,7 @@
     <Folder Include="Domain\Lobby\Exception\" />
     <Folder Include="ClientApp\" />
     <Folder Include="Domain\Trpg\" />
-    <Folder Include="Infrastructure\Data\FiveUsers\Migrations\" />
     <Folder Include="Infrastructure\Models\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
